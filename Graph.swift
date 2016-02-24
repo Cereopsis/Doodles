@@ -74,7 +74,7 @@ enum Node {
 
 }
 
-struct Edge {
+class Edge {
     
     let vertex: Int
     var connections: [Int] = []
@@ -83,19 +83,14 @@ struct Edge {
         self.vertex = vertex
     }
     
-    mutating func addConnection(connection: Int) {
+    /// Connect two vertices. `self` is considered the owner, which makes this a directed graph?
+    func addConnection(connection: Int) {
         if connection != vertex && !connections.contains(connection) {
             connections.append(connection)
         }
     }
     
-    func connectionTo(other: Edge) -> Node? {
-        if isConnected(other.vertex) {
-            return Node.Fork(.Leaf(self.vertex), .Leaf(other.vertex))
-        }
-        return nil
-    }
-    
+    /// Returns an enumeration of all connected vertices in Node.Fork(.Leaf(_), .Leaf(_)) format
     func connectionsTo(vertices: Set<Int>) -> [Node] {
         return vertices
                .intersect(connections)
@@ -104,42 +99,36 @@ struct Edge {
                }
     }
     
+    /// Returns true if `vertex` is contained in `connections`
     func isConnected(vertex: Int) -> Bool {
         return connections.contains(vertex)
     }
 }
 
-struct Graph {
+class Graph {
     
-    let vertices: Set<Int>
+    let vertices: Range<Int>
     var edges: [Int: Edge] = [:]
     
-    init(vertices: Set<Int>) {
+    init(vertices: Range<Int>) {
         self.vertices = vertices
-        for i in vertices {
-            edges[i] = Edge(vertex: i)
-        }
     }
     
     subscript(key: Int) -> Edge? {
         return edges[key]
     }
     
-    mutating func connect(src: Int, dest: Int) {
+    /// Create an Edge object for each connected pair
+    func connect(src: Int, dest: Int) {
         if vertices.contains(src) && vertices.contains(dest) {
-            edges[src]!.addConnection(dest)
+            if let edge = edges[src] {
+                edge.addConnection(dest)
+            } else {
+                let edge = Edge(vertex: src)
+                edge.addConnection(dest)
+                edges[src] = edge
+            }
         }
     }
     
-    func connectedNodes(node: Node) -> [Node] {
-        let vertices = node.vertices()
-        return edges
-            .filter{ !vertices.contains($0.0) }
-            .flatMap{ i, e in
-                if e.connections.contains(node.head()) {
-                    return Node.Fork(.Leaf(i), node)
-                }
-                return nil
-            }
-    }
 }
