@@ -51,10 +51,42 @@ func *<T>(lhs: Point<T>, rhs: Point<T>) -> Point<T> {
     return Point(lhs.x * rhs.x, lhs.y * rhs.y)
 }
 
+/// Provides a generator over a Matrix so that we can do stuff
+/// like transform elements on the fly
+struct MatrixGenerator: GeneratorType, SequenceType {
+
+    typealias Generator = MatrixGenerator
+    typealias Element = Point<Int>
+
+    let columns: Int
+    let rows: Int
+    private var counter: Int = 0
+    
+    init(_ columns: Int, _ rows: Int) {
+        self.columns = columns
+        self.rows = rows
+    }
+    
+    func generate() -> Generator {
+        return self
+    }
+    
+    mutating func next() -> Element? {
+        if counter == columns * rows {
+            return nil
+        }
+        
+        defer {
+            counter += 1
+        }
+        
+        return Point(counter % columns, counter / rows)
+    }
+}
 
 struct Matrix {
     
-    static let origin: Point<Int> = Point(x: 0, y: 0)
+    static let origin: Point<Int> = Point(0, 0)
     
     let columns: Int
     let rows: Int
@@ -72,15 +104,15 @@ struct Matrix {
     }
     
     var topRight: Point<Int> {
-        return Point(x: columns - 1, y: 0)
+        return Point(columns - 1, 0)
     }
     
     var bottomLeft: Point<Int> {
-        return Point(x: 0, y: rows - 1)
+        return Point(0, rows - 1)
     }
     
     var bottomRight: Point<Int> {
-        return Point(x: columns - 1, y: rows - 1)
+        return Point(columns - 1, rows - 1)
     }
     
     func valueAt(point: Point<Int>) -> Int? {
@@ -94,4 +126,17 @@ struct Matrix {
         }
         return nil
     }
+    
+    private func locationOf(point: Point<Int>) -> Int {
+        return  point.x + columns * point.y
+    }
+    
+    private func locationOf(x: Int, y: Int) -> Int {
+        return x + columns * y
+    }
+    
+    private func pointAt(index: Int) -> Point<Int> {
+        return Point(index % columns, index / columns)
+    }
+    
 }
