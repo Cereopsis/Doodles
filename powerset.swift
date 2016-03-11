@@ -25,24 +25,30 @@ SOFTWARE.
 import Foundation
 
 func powerset(nums: [Int]) -> [Set<Int>] {
-    var result: [Set<Int>] = []
-    for i in nums.startIndex..<nums.endIndex {
-        for j in (i..<nums.endIndex).reverse() {
-            if  i + 1 > j {
-                result.append(Set(nums[i...i]))
-                continue
-            }
-            for k in (i+1)...j {
-                let set = nums[i...i] + nums[k...j]
-                result.append(Set(set))
-            }
+    func recurse(xs: [Set<Int>], acc: [Set<Int>]) -> [Set<Int>] {
+        if xs.count <= 1 {
+            return acc
         }
+        let member = xs.first!
+        let pset = xs.dropFirst().reduce([Set<Int>]()){ (a: [Set<Int>], b: Set<Int>) -> [Set<Int>] in
+            return a + [member.union(b)]
+        }
+        return recurse(Array(pset.dropFirst()), acc: []) + recurse(pset, acc: acc + pset)
     }
-
+    
+    
+    let input = nums.map{ Set([$0]) }
+    var result = input
+    for i in 0..<input.endIndex {
+        let set = recurse(Array(input[i..<input.endIndex]), acc: [])
+        result.appendContentsOf(set)
+    }
+    
     return result
+    
 }
 
-func xorSum(set: Set<Int>) -> Int {
+func xorSum<T: CollectionType where T.Generator.Element == Int>(set:T) -> Int {
     if set.isEmpty {
         return 0
     } else if set.count == 1 {
