@@ -24,28 +24,33 @@ SOFTWARE.
 
 import Foundation
 
-func powerset(nums: [Int]) -> [Set<Int>] {
-    func recurse(xs: [Set<Int>], acc: [Set<Int>]) -> [Set<Int>] {
-        if xs.count <= 1 {
-            return acc
+func powerset(numbers: [Int]) -> [Set<Int>] {
+    
+    func combine(head: Set<Int>, tail: ArraySlice<Set<Int>>) -> [Set<Int>] {
+        if tail.isEmpty {
+            return [head]
         }
-        let member = xs.first!
-        let pset = xs.dropFirst().reduce([Set<Int>]()){ (a: [Set<Int>], b: Set<Int>) -> [Set<Int>] in
-            return a + [member.union(b)]
+        
+        return tail.reduce([Set<Int>]()){(a: [Set<Int>], b: Set<Int>) -> [Set<Int>] in
+            return a + [head.union(b)]
         }
-        return recurse(Array(pset.dropFirst()), acc: []) + recurse(pset, acc: acc + pset)
+        
     }
     
-    
-    let input = nums.map{ Set([$0]) }
-    var result = input
-    for i in 0..<input.endIndex {
-        let set = recurse(Array(input[i..<input.endIndex]), acc: [])
-        result.appendContentsOf(set)
+    func recurse(input: ArraySlice<Set<Int>>, accumulator: [Set<Int>]) -> [Set<Int>] {
+        if input.count <= 1 {
+            return accumulator
+        }
+        let x = combine(input.first!, tail: input.dropFirst(1))
+        return recurse(x.dropFirst(0), accumulator: accumulator + x) + recurse(input.dropFirst(1), accumulator: [])
     }
     
-    return result
+    if numbers.isEmpty {
+        return []
+    }
     
+    let set = numbers.map{ Set([$0]) }
+    return recurse(set.dropFirst(0), accumulator: set)
 }
 
 func xorSum<T: CollectionType where T.Generator.Element == Int>(set:T) -> Int {
