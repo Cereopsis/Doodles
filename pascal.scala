@@ -17,7 +17,7 @@ object Pascal extends App {
         else {
             val numer = (k + 1) until (k + n)
             val denom = 1 until n
-            numer.zip(denom).foldLeft(BigInt(1))((a, b) => (a * b._1)/b._2) % modulus
+            numer.zip(denom).foldLeft(BigInt(1))((a, b) => (a * b._1)/b._2)
         } 
     }
 
