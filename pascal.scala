@@ -11,5 +11,14 @@ object Pascal extends App {
                         .foldLeft(BigInt(1))((a, b) => (a * b._1)/b._2 )
         }
     }
+    
+    def diagonal(n: Int, k: Int): BigInt = {
+        if (n == 1 || k == 1) n
+        else {
+            val numer = (k + 1) until (k + n)
+            val denom = 1 until n
+            numer.zip(denom).foldLeft(BigInt(1))((a, b) => (a * b._1)/b._2) % modulus
+        } 
+    }
 
 }
