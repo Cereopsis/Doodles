@@ -78,8 +78,7 @@ struct Matrix {
     /// Rotate the 'rings' of a matrix in a counter-clockwise fashion
     func rotate(moves: Int) -> Matrix {
         if isSquare && moves % circumference == 0 {
-            // Optimisation: if we're square and the number of moves
-            // mod the count of our outer ring == 0, we're done!
+            // Optimisation: we're done here!
             return self
         }
         
