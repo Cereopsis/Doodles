@@ -5,10 +5,12 @@ A place for all sorts of nonsense
 A rudimentary implementation that only supports adding at the moment :-)
 
 ## Map
+`
 m map f == m match {
                 case x :: xs => f(x) :: xs.map(f)     // f returns a single T
                 case Nil => Nil
            }
+ `
 
 ## FlatMap
 m flatMap f == m match {
