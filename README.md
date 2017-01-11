@@ -13,16 +13,20 @@ m map f == m match {
 </pre>
 
 ## FlatMap
+<pre>
 m flatMap f == m match {
                 case x :: xs => f(x) ++ xs.flatMap(f)  // f returns a collection of T
                 case Nil => Nil
                }
+</pre>
                
 ## Filter
+<pre>
 m filter p == m match {
                 case x :: xs => if p(x) x :: xs.filter(p) else xs.filter(p)
                 case Nil => Nil
               }
+</pre>
 
 ## Monad
 
