@@ -44,3 +44,6 @@ A Monad type must obey the following:
   
  . Right Unit
   m flatMap unit == m
+
+## Example
+See MonadExample.scala
