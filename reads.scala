@@ -1,30 +1,26 @@
 
 import play.api.libs.json.{Json,JsValue,Writes,Reads}
 
-trait Response[+A] {
-  def code: Int
-  def body: A
-  def error: Option[String] = None
+sealed trait Response
+case class ErrorResponse(code: Int, reason: String) extends Response
+
+object ErrorResponse {
+  val InternalServerError = ErrorResponse(500, "Internal Server Error")
+  val NotFound = ErrorResponse(404, "Not Found")
+  implicit val errorWrites = Json.writes[ErrorResponse]
 }
 
-case class OK[+A](body: A) extends Response[A] {
+case class OK[+A](body: A) extends Response {
   val code = 200
 }
 
-object Response {
-  implicit def responseWriter[A](implicit w: Writes[A]): Writes[Response[A]] = new Writes[Response[A]]{
-    override def writes(o: Response[A]): JsValue = Json.obj(
+object OK {
+  implicit def okWriter[A](implicit w: Writes[A]): Writes[OK[A]] = new Writes[OK[A]]{
+    override def writes(o: OK[A]): JsValue = Json.obj(
       "code" -> o.code,
-      "body" -> o.body,
-      "error" -> o.error
+      "body" -> o.body
     )
   }
-}
-
-case object InternalServerError extends Response[Any] {
-  val code = 500
-  val body = None
-  override val error = Some("Internal Server Error")
 }
 
 
@@ -44,8 +40,10 @@ val coppola = Director("Francis Ford Coppola", war :: Nil)
 val wilder  = Director("Billy Wilder", comedies)
 
 import CinemaImplicits.{movieWrites,directorWrites}
-val okey = OK(war)
-implicit val okwrites = Response.responseWriter[Movie](a => okey.body)
-Json.toJson(okey)
+Json.toJson(OK(war))
+Json.toJson(OK(comedies))
+Json.toJson(OK(wilder))
 
-Json.toJson(OK(wilder))(Response.responseWriter[Director](a => wilder))
+import ErrorResponse.{InternalServerError,NotFound}
+Json.toJson(InternalServerError)
+Json.toJson(NotFound)
