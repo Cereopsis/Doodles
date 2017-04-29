@@ -12,11 +12,10 @@ case class OK[+A](body: A) extends Response[A] {
 }
 
 object Response {
-  import play.api.libs.json.Json.JsValueWrapper
-  def responseWriter[A](f: A => JsValueWrapper): Writes[Response[A]] = new Writes[Response[A]]{
+  implicit def responseWriter[A](implicit w: Writes[A]): Writes[Response[A]] = new Writes[Response[A]]{
     override def writes(o: Response[A]): JsValue = Json.obj(
       "code" -> o.code,
-      "body" -> f(o.body),
+      "body" -> o.body,
       "error" -> o.error
     )
   }
