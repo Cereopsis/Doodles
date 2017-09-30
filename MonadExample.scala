@@ -11,13 +11,13 @@ object Main extends App {
   val f = (i: Int) => Feature(s"Hello $i")
   val g = (s: String) => Feature(s.toUpperCase)
   
-  val associates = (m flatMap f) flatMap g == m flatMap (x => f(x) flatMap g)
+  val associates = ((m flatMap f) flatMap g) == (m flatMap (x => f(x) flatMap g))
   println(s"Associates? ${associates}")
   
-  val leftUnit = Feature(100) flatMap f == f(100)
+  val leftUnit = (Feature(100) flatMap f) == f(100)
   println(s"Left unit holds? ${leftUnit}")
   
-  val rightUnit = m flatMap Feature.apply = m
+  val rightUnit = (m flatMap Feature.apply _) == m
   println(s"Right unit holds? ${rightUnit}")
  
 }
