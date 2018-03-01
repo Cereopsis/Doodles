@@ -34,10 +34,12 @@ final case class Person(name: String, dob: String, died: Option[String] = None)
 // In the above cases these are the implicit singleton objets
 def isValid[A:Expires](x: A) = !Expires[A].hasExpired(x)
 
+implicit val expirationPeriod: Duration = 30 seconds
+
 val session = Session(LocalDateTime.now.minusSeconds(10))
 val actress = Person("Alicia Vikander", "1988-10-03")
 val poet    = Person("George Gordon Byron", "1788", Some("1824"))
 
-isValid(session)
+isValid(session) // try this a few times over 20-30 seconds
 isValid(actress)
 isValid(poet)
